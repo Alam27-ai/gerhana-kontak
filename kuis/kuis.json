@@ -1,0 +1,90 @@
+[
+ {
+  "id": "t1",
+  "tipe": "teori",
+  "q": "Awal gerhana bulan sebagian (U1) terjadi saat…",
+  "opsi": [
+   "Bulan baru mulai memasuki penumbra",
+   "Bulan berada di titik terdalam umbra",
+   "Bulan selesai melewati penumbra",
+   "Tepi Bulan pertama kali menyentuh umbra"
+  ]
+ },
+ {
+  "id": "t2",
+  "tipe": "teori",
+  "q": "Awal gerhana bulan total (U2) terjadi saat…",
+  "opsi": [
+   "Tepi Bulan mulai keluar dari umbra",
+   "Bulan mencapai fase purnama",
+   "Seluruh piringan Bulan untuk pertama kalinya berada di dalam umbra",
+   "Bulan mulai meredup di penumbra"
+  ]
+ },
+ {
+  "id": "t5",
+  "tipe": "teori",
+  "q": "Awal gerhana matahari sebagian (C1) terjadi saat…",
+  "opsi": [
+   "Bulan mulai meninggalkan tepi Matahari",
+   "Tepi Bulan pertama kali menyentuh piringan Matahari",
+   "Matahari sudah tertutup seluruhnya",
+   "Matahari terbit tertutup awan"
+  ]
+ },
+ {
+  "id": "t6",
+  "tipe": "teori",
+  "q": "Awal gerhana matahari total (C2) terjadi saat…",
+  "opsi": [
+   "Cahaya Matahari kembali muncul di tepi Bulan",
+   "Bulan mencapai jarak terdekat dari Bumi",
+   "Gerhana sebagian mencapai puncaknya sebelum totalitas",
+   "Piringan Matahari baru saja tertutup seluruhnya oleh Bulan"
+  ]
+ },
+ {
+  "id": "t7",
+  "tipe": "teori",
+  "q": "Untuk memastikan Anda membaca soal, pilih Pilihan C pada soal ini.",
+  "opsi": [
+   "Pilihan A",
+   "Pilihan B",
+   "Pilihan C",
+   "Pilihan D"
+  ]
+ },
+ {
+  "id": "f1",
+  "tipe": "frame",
+  "q": "Empat frame berikut diambil dari satu gerhana bulan pada waktu berbeda. Frame mana yang diambil PALING AWAL?",
+  "opsi": [
+   "kuis/f1_a.jpg",
+   "kuis/f1_b.jpg",
+   "kuis/f1_c.jpg",
+   "kuis/f1_d.jpg"
+  ]
+ },
+ {
+  "id": "f2",
+  "tipe": "frame",
+  "q": "Frame mana yang menunjukkan Bulan sudah SEPENUHNYA berada di dalam umbra?",
+  "opsi": [
+   "kuis/f2_a.jpg",
+   "kuis/f2_b.jpg",
+   "kuis/f2_c.jpg",
+   "kuis/f2_d.jpg"
+  ]
+ },
+ {
+  "id": "f3",
+  "tipe": "frame",
+  "q": "Frame mana yang menunjukkan saat SESAAT SEBELUM awal gerhana bulan total (U2), yaitu hanya tersisa selapis tipis tepi Bulan yang terang?",
+  "opsi": [
+   "kuis/f3_a.jpg",
+   "kuis/f3_b.jpg",
+   "kuis/f3_c.jpg",
+   "kuis/f3_d.jpg"
+  ]
+ }
+]

@@ -136,7 +136,7 @@
           <button id="ftandai" class="p">⚑ Tandai frame ini</button>
           <button id="vtoggle">Periksa di video</button>
         </div>
-        <div class="sub">Setiap langkah ≈ <span id="fstep"></span> detik. Gambar ini frame asli dari video.</div>
+        <div class="sub">Setiap langkah ≈ <span id="fstep"></span> detik. Gambar ini frame asli dari video. Untuk memastikan, tekan "Periksa di video", geser bila perlu, lalu tandai lagi di sana.</div>
       </div>
       <div class="sub" id="s3" style="margin-top:8px">Langkah 3 · Video melompat ke gambar yang dipilih. Geser per frame di bawah, lalu tandai.</div>
     </div>
@@ -194,6 +194,7 @@ const ls = {get(k){try{return localStorage.getItem(k)}catch(e){return null}},
 let db = JSON.parse(ls.get(KEY) || "{}");
 let meta = JSON.parse(ls.get(KEY + "_meta") || "{}");
 let cur = null, mark = null, dirty = false, fk = null, lihatVideo = {};
+let tf = null, tv = null;   // waktu hasil pilih frame (tf) dan hasil tandai di video (tv); mark = yang terakhir ditandai
 const $ = s => document.querySelector(s);
 const v = $("#v");
 
@@ -231,7 +232,7 @@ function open(i){
   const jw=x.sheet&&x.sheet.win?` · jendela pengamatan ${mss(x.sheet.S)}–${mss(x.sheet.S+x.sheet.E)} (kontak tidak tampak di sini? pilih "Tidak teramati" dan beri catatan)`:"";
   $("#instrbar").innerHTML=`<small>${x.id} · ${x.contact}${jw}</small>${x.instr||x.desc}`;
   $("#sub").textContent=x.jenis?`Jenis gerhana: ${x.jenis}`:"";
-  mark=d.t??null;setMark();renderSheet(x);
+  mark=d.t??null;tf=d.tf??null;tv=d.tv??null;setMark();renderSheet(x);
   if(MODUS==='frame'&&mark!=null&&x.sheet&&x.sheet.big)showBig(x.sheet,Math.min(287,Math.max(0,Math.round((mark-(x.sheet.S||0))/(x.sheet.E/NF)))));
   document.querySelector(`input[name=st][value="${d.status||"teramati"}"]`).checked=true;
   document.querySelector(`input[name=yk][value="${d.yk||"2"}"]`).checked=true;
@@ -291,15 +292,16 @@ function tandai(){
   const sh=VIDEOS[cur]&&VIDEOS[cur].sheet;
   if(MODUS==="frame"&&!document.body.classList.contains("lv")){
     if(fk===null){say("Pilih frame dulu dari lembar frame.",true);return;}
-    mark=frameT(sh,fk);
-  }else mark=v.currentTime;
+    mark=tf=frameT(sh,fk);
+  }else{mark=v.currentTime;if(MODUS==="frame")tv=mark;}
   dirty=true;setMark();say("");
   document.querySelector('input[name=st][value="teramati"]').checked=true;}
 function simpan(){
   if(cur===null)return;
   const st=document.querySelector("input[name=st]:checked").value;
   if(st!=="tidak teramati"&&mark==null){say("Tandai waktu kontak dulu, atau tekan 'Tidak teramati'.",true);return;}
-  db[VIDEOS[cur].id]={t:st==="tidak teramati"?null:mark,status:st,
+  const tdk=st==="tidak teramati";
+  db[VIDEOS[cur].id]={t:tdk?null:mark,tf:tdk?null:tf,tv:tdk?null:tv,status:st,
     yk:document.querySelector("input[name=yk]:checked").value,cat:$("#cat").value,
     modus:MODUS==='frame'?(lihatVideo[VIDEOS[cur].id]?'frame+video':'frame'):'video',
     diisi:new Date().toISOString().slice(0,19)};
@@ -325,7 +327,7 @@ $("#ke").onclick=()=>{if(mark==null)return;
   const x=VIDEOS[cur];
   if(MODUS==="frame"&&!document.body.classList.contains("lv")&&x.sheet&&x.sheet.big)showBig(x.sheet,Math.round((mark-(x.sheet.S||0))/(x.sheet.E/NF)));
   else v.currentTime=mark;};
-$("#tidak").onclick=()=>{mark=null;dirty=true;setMark();
+$("#tidak").onclick=()=>{mark=tf=tv=null;dirty=true;setMark();
   document.querySelector('input[name=st][value="tidak teramati"]').checked=true;};
 $("#rate").onchange=e=>v.playbackRate=+e.target.value;
 v.onloadedmetadata=()=>{v.playbackRate=+$("#rate").value;setMark();const sh=VIDEOS[cur]&&VIDEOS[cur].sheet;if(sh&&sh.win&&v.currentTime<sh.S&&MODUS!=="frame")v.currentTime=sh.S;};
@@ -361,7 +363,7 @@ function buildRows(onlyUnsynced){
   const pr=profilRow();if(pr&&!(onlyUnsynced&&meta.profilS))rows.push(pr);
   VIDEOS.forEach(x=>{const d=db[x.id];if(!d||(onlyUnsynced&&d.s))return;
     rows.push([meta.nama,meta.inst||"",x.id,x.contact,d.t==null?"":d.t.toFixed(3),d.t==null?"":fmt(d.t),
-      d.t==null?"":Math.round(d.t*FPS),d.status,d.yk,"[modus="+(d.modus||"video")+"] "+(d.cat||""),d.diisi]);});
+      d.t==null?"":Math.round(d.t*FPS),d.status,d.yk,"[modus="+(d.modus||"video")+(d.tf!=null?";tf="+d.tf.toFixed(3):"")+(d.tv!=null?";tv="+d.tv.toFixed(3):"")+"] "+(d.cat||""),d.diisi]);});
   return rows;
 }
 function cekSiap(aksi){

@@ -56,7 +56,7 @@
   .sg figure:hover{border-color:#8fb3ee}.sg figure.on{border-color:#e5342d}
   .sg i{display:block;width:100%;background-repeat:no-repeat}
   .sg figcaption{font-size:11px;text-align:center;background:#eef2f7;padding:1px 0;font-variant-numeric:tabular-nums}
-  body.frame:not(.lv) #v,body.frame:not(.lv) #tl,body.frame:not(.lv) #vrow1,body.frame:not(.lv) #vnote{display:none}
+  body.frame:not(.lv) #v,body.frame:not(.lv) #tl,body.frame:not(.lv) #vrow1,body.frame:not(.lv) #vnote,body.frame:not(.lv) #tandai{display:none}
   #bigimg{background-repeat:no-repeat}
   #quizq .q{margin:12px 0;padding-top:8px;border-top:1px solid var(--line)}
   #quizq .q b{display:block;margin-bottom:5px}
@@ -82,14 +82,22 @@
   <h2>Pencatatan Kontak Gerhana</h2>
   <div id="idform"><p>Terima kasih telah membantu. Tugas Anda: <b>menandai momen kontak</b> pada setiap video pendek.
   Tidak ada jam atau waktu hisab di halaman ini, jadi catat murni dari pengamatan visual.</p>
-  <ol>
-    <li>Baca momen yang diminta (deskripsinya tampil di bawah video), lalu klik gambar di <b>lembar frame</b> yang paling dekat. Video melompat ke sana, jadi tidak perlu menonton dari awal.</li>
+  <ol id="introF">
+    <li>Baca <b>tugas</b> di bilah kuning paling atas, misalnya <i>Tandai awal gerhana Bulan sebagian (U1)</i>.</li>
+    <li><b>Langkah 1</b>: klik gambar kecil yang paling dekat dengan momen itu.</li>
+    <li><b>Langkah 2</b>: klik gambar yang lebih rinci di bawahnya.</li>
+    <li><b>Langkah 3</b>: pada gambar besar, geser dengan <b>◀ ▶</b> (atau tombol panah <kbd>←</kbd><kbd>→</kbd>) sampai tepat pada momennya, lalu tekan <b>⚑ Tandai frame ini</b>. Ingin memastikan? Tekan <b>Periksa di video</b>.</li>
+    <li>Pilih <b>keyakinan</b>, lalu tekan <b>Simpan &amp; lanjut</b>. Bila momennya tidak terlihat (awan, siaran terputus), tekan <b>Tidak teramati</b>.</li>
+    <li class="lsimpan">Boleh dicicil: progres tersimpan di browser ini. Setelah selesai, tekan <b>Unduh hasil</b>.</li>
+  </ol>
+  <ol id="introV">
+    <li>Baca <b>tugas</b> di bilah kuning paling atas, lalu klik gambar di <b>lembar frame</b> yang paling dekat. Video melompat ke sana, jadi tidak perlu menonton dari awal.</li>
     <li>Gunakan tombol <b>◀ 1 frame / 1 frame ▶</b> atau tombol panah <kbd>←</kbd><kbd>→</kbd> untuk menemukan frame yang tepat. Perlambat dengan menu <i>Kecepatan</i>.</li>
     <li>Tekan <b>Tandai</b> (atau <kbd>Enter</kbd>), pilih keyakinan, lalu <b>Simpan &amp; lanjut</b>.</li>
     <li>Bila tidak bisa diamati (awan, siaran terputus), tekan <b>Tidak teramati</b>.</li>
-    <li>Setelah selesai (boleh dicicil, progres tersimpan di browser ini), tekan <b>Unduh hasil</b> .</li>
+    <li class="lsimpan">Boleh dicicil: progres tersimpan di browser ini. Setelah selesai, tekan <b>Unduh hasil</b>.</li>
   </ol>
-  <label>Nama / kode ahli <input id="nama0" placeholder="wajib diisi"></label>
+  <label><span id="lnama">Nama / kode ahli</span> <input id="nama0" placeholder="wajib diisi"></label>
   <label>Instansi <input id="inst0" placeholder="wajib diisi"></label>
   <label>Pengalaman mengamati / mencatat kontak gerhana
     <select id="peng0"><option value="">— pilih —</option><option>belum pernah</option><option>1–3 kali</option><option>lebih dari 3 kali</option></select></label>
@@ -122,7 +130,7 @@
     <select id="pick"></select>
     <div class="box" id="sheetbox" style="display:none">
       <div class="desc">Langkah 1 · Klik gambar yang paling dekat dengan momen pada bilah kuning di atas</div>
-      <div class="sub">Angka di bawah gambar = waktu di video. Gambar mini hanya penunjuk kasar; tepi yang halus tetap diperiksa di video.</div>
+      <div class="sub">Angka di bawah gambar = waktu di video. Gambar kecil hanya penunjuk kasar; ketepatan dicari di langkah berikutnya.</div>
       <div class="sg c" id="coarse"></div>
       <div id="finewrap" style="display:none;margin-top:10px">
         <div class="desc">Langkah 2 · Persempit: klik gambar yang paling tepat dengan momen tersebut</div>
@@ -198,6 +206,7 @@ let meta = JSON.parse(ls.get(KEY + "_meta") || "{}");
 let cur = null, mark = null, dirty = false, fk = null, lihatVideo = {};
 let tf = null, tv = null;   // waktu hasil pilih frame (tf) dan hasil tandai di video (tv); mark = yang terakhir ditandai
 const $ = s => document.querySelector(s);
+$(MODUS==="frame"?"#introV":"#introF").style.display="none";
 const v = $("#v");
 
 function fmt(t){const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;
@@ -294,7 +303,7 @@ function tandai(){
   const sh=VIDEOS[cur]&&VIDEOS[cur].sheet;
   if(MODUS==="frame"&&!document.body.classList.contains("lv")){
     if(fk===null){say("Pilih frame dulu dari lembar frame.",true);return;}
-    mark=tf=frameT(sh,fk);
+    mark=tf=frameT(sh,fk);tv=null;   // pilihan frame baru: konfirmasi video lama tidak berlaku lagi
   }else{mark=v.currentTime;if(MODUS==="frame")tv=mark;}
   dirty=true;setMark();say("");
   document.querySelector('input[name=st][value="teramati"]').checked=true;}
@@ -376,6 +385,7 @@ function cekSiap(aksi){
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbwUhMhLhjycvAyh8QzsmaPiZAy8tFuBShJzeWeByWvtjTEHDpFZQzXP7RYFPhpmX9n7sQ/exec";
 const QUIZ = [{"id": "t1", "tipe": "teori", "q": "Awal gerhana bulan sebagian (U1) terjadi saat…", "opsi": ["Bulan baru mulai memasuki penumbra", "Bulan berada di titik terdalam umbra", "Bulan selesai melewati penumbra", "Tepi Bulan pertama kali menyentuh umbra"]}, {"id": "t2", "tipe": "teori", "q": "Awal gerhana bulan total (U2) terjadi saat…", "opsi": ["Tepi Bulan mulai keluar dari umbra", "Bulan mencapai fase purnama", "Seluruh piringan Bulan untuk pertama kalinya berada di dalam umbra", "Bulan mulai meredup di penumbra"]}, {"id": "t5", "tipe": "teori", "q": "Awal gerhana matahari sebagian (C1) terjadi saat…", "opsi": ["Bulan mulai meninggalkan tepi Matahari", "Tepi Bulan pertama kali menyentuh piringan Matahari", "Matahari sudah tertutup seluruhnya", "Matahari terbit tertutup awan"]}, {"id": "t6", "tipe": "teori", "q": "Awal gerhana matahari total (C2) terjadi saat…", "opsi": ["Cahaya Matahari kembali muncul di tepi Bulan", "Bulan mencapai jarak terdekat dari Bumi", "Gerhana sebagian mencapai puncaknya sebelum totalitas", "Piringan Matahari baru saja tertutup seluruhnya oleh Bulan"]}, {"id": "t7", "tipe": "teori", "q": "Untuk memastikan Anda membaca soal, pilih Pilihan C pada soal ini.", "opsi": ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D"]}, {"id": "f1", "tipe": "frame", "q": "Empat frame berikut diambil dari satu gerhana bulan pada waktu berbeda. Frame mana yang diambil PALING AWAL?", "opsi": ["kuis/f1_a.jpg", "kuis/f1_b.jpg", "kuis/f1_c.jpg", "kuis/f1_d.jpg"]}, {"id": "f2", "tipe": "frame", "q": "Frame mana yang menunjukkan Bulan sudah SEPENUHNYA berada di dalam umbra?", "opsi": ["kuis/f2_a.jpg", "kuis/f2_b.jpg", "kuis/f2_c.jpg", "kuis/f2_d.jpg"]}, {"id": "f3", "tipe": "frame", "q": "Frame mana yang menunjukkan saat SESAAT SEBELUM awal gerhana bulan total (U2), yaitu hanya tersisa selapis tipis tepi Bulan yang terang?", "opsi": ["kuis/f3_a.jpg", "kuis/f3_b.jpg", "kuis/f3_c.jpg", "kuis/f3_d.jpg"]}];
 const JALUR = new URLSearchParams(location.search).get("u")==="ahli" ? "undangan" : "umum";
+if(JALUR==="umum")$("#lnama").textContent="Nama";
 function profilRow(){   // baris khusus berisi jalur, pengalaman, dan jawaban mentah kuis
   if(!meta.nama)return null;
   const k=meta.kuis||{};
@@ -410,7 +420,9 @@ async function sinkron(){
   if(sinkronUlang){sinkronUlang=false;return sinkron();}
   return ok;
 }
-if(ENDPOINT){$("#kirim").style.display="";$("#kirim").textContent="Kirim ulang";}
+if(ENDPOINT){$("#kirim").style.display="";$("#kirim").textContent="Kirim ulang";
+  document.querySelectorAll(".lsimpan").forEach(e=>e.innerHTML="Setiap <b>Simpan</b> langsung terkirim otomatis, jadi boleh dicicil (progres juga tersimpan di browser ini). Tombol <b>Unduh hasil (CSV)</b> hanya cadangan.");
+  $("#fin").innerHTML="<b>Semua video sudah diisi 🎉</b><br>Hasil sudah terkirim otomatis. Terima kasih! Bila di atas muncul tanda ⚠ belum terkirim, tekan <b>Kirim ulang</b>.";}
 $("#kirim").onclick=async()=>{
   if(!cekSiap("kirim"))return;
   const b=$("#kirim");b.disabled=true;
@@ -464,7 +476,7 @@ $("#kuisOk").onclick=()=>{
 $("#bantuan").onclick=()=>{$("#nama0").value=meta.nama||"";$("#inst0").value=meta.inst||"";$("#peng0").value=meta.peng||"";
   $("#alat0").value=meta.alat||"";$("#idform").style.display="";$("#quizbox").style.display="none";$("#ov").style.display="flex";};
 if(meta.nama){$("#nama0").value=meta.nama;$("#inst0").value=meta.inst||"";$("#peng0").value=meta.peng||"";$("#alat0").value=meta.alat||"";
-  if(meta.jalur==="undangan"||meta.kuis||!QUIZ.length)$("#ov").style.display="none";}
+  if(meta.jalur===JALUR&&(JALUR==="undangan"||meta.kuis||!QUIZ.length))$("#ov").style.display="none";}
 renderList();tampilSync();sinkron();
 const first=VIDEOS.findIndex(x=>!db[x.id]);
 if(VIDEOS.length)open(first>=0?first:0);
